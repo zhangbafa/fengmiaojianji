@@ -4,7 +4,6 @@ logs/
 run/
 build/
 .idea/
-package-lock.json
 data/
 .vscode/launch.json
 public/electron/
