@@ -2,9 +2,12 @@ node_modules
 out/
 logs/
 run/
+build/
 .idea/
 package-lock.json
 data/
 .vscode/launch.json
 public/electron/
 pnpm-lock.yaml
+HX_media_durations_cache.json
+HY_media_durations_cache.json

@@ -7,6 +7,11 @@
     <title></title>
     <!-- 优化：vue渲染未完成之前，先加一个css动画 -->
     <style>
+      body {
+        background-color: var(--color-bg-1);
+        color: var(--color-text-1);
+        color-scheme: dark; 
+      }
       #loadingPage {
         background-color: #dedede;
         font-size: 12px;
@@ -101,5 +106,15 @@
     </div>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+    <script>
+      const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
+      darkThemeMq.addEventListener('change', e => {
+        if (e.matches) {
+          document.body.setAttribute('arco-theme', 'dark');
+        } else {
+          document.body.removeAttribute('arco-theme');
+        }
+      });
+    </script>
   </body>
 </html>

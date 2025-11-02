@@ -1,22 +1,68 @@
 <template>
-  <section id="hero">
-    <h1 class="tagline">
-      <span class="accent">Electron-Egg</span>
-    </h1>
-    <p class="description">
-      A fast, desktop software development framework
-    </p>
-    <p class="actions">
-      <a class="setup" href="https://www.kaka996.com/" target="_blank">Get Started</a>
-    </p>
-  </section>
+  <a-config-provider>
+    <div class="app">
+      <a-layout>
+        <a-layout-content>
+          <VideoConfigManager />
+        </a-layout-content>
+      </a-layout>
+    </div>
+  </a-config-provider>
 </template>
+
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.app {
+  min-height: 100vh;
+  background-color: rgb(var(--color-neutral-3))
+}
+
+h1 {
+  margin: 0;
+  color: white;
+}
+
+.a-layout-header {
+  background-color: var(--color-primary);
+  /* padding: 0 24px; */
+  /* height: 64px; */
+  /* line-height: 64px; */
+}
+
+.a-layout-content {
+  padding: 24px;
+  /* background: #fff; */
+}
+
+.a-layout-footer {
+  text-align: center;
+  background-color: var(--color-bg-2);
+  padding: 16px 24px;
+}
+
+.error-message {
+  color: red;
+  padding: 10px;
+  margin: 10px;
+  margin-bottom: 15px;
+  border: 1px solid red;
+  background-color: #ffeeee;
+}
+</style>
 <script setup>
-console.log("hello")
+import { ref, onMounted } from 'vue';
+import VideoConfigManager from '@/components/VideoConfigManager.vue'
+
 </script>
 <style scoped>
 section {
-  padding: 42px 32px;
+  padding: 20px;
 }
 
 #hero {
