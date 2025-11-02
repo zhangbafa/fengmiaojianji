@@ -1,232 +1,168 @@
-[![star](https://gitee.com/dromara/electron-egg/badge/star.svg?theme=gvp)](https://gitee.com/dromara/electron-egg/stargazers)
-[![GitHub](https://img.shields.io/github/stars/dromara/electron-egg.svg?style=social&label=Stars)](https://github.com/dromara/electron-egg)
-[![Star](https://gitcode.com/dromara/electron-egg/star/badge.svg)](https://gitcode.com/dromara/electron-egg)
+# ElectronEgg - 跨平台桌面应用开发框架
+
+[![GitHub stars](https://img.shields.io/github/stars/dromara/electron-egg.svg?style=social&label=Stars)](https://github.com/dromara/electron-egg)
+[![Gitee stars](https://gitee.com/dromara/electron-egg/badge/star.svg?theme=gvp)](https://gitee.com/dromara/electron-egg/stargazers)
 [![License](https://img.shields.io/badge/License-Apache-blue.svg)](https://gitee.com/dromara/electron-egg/blob/master/LICENSE)
+[![Version](https://img.shields.io/badge/version-4.1.0-brightgreen.svg)](package.json)
 
-<div align=center>
-<h3>🎉🎉🎉 ElectronEgg v4 has been released! 🎉🎉🎉</h3>
-</div>
-<br>
-
-<div align=center>
-<img src="./public/images/example/logo.png" width="150" height="150" />
+<div align="center">
+  <img src="./public/images/example/logo.png" width="150" height="150" alt="ElectronEgg Logo" />
+  <h1>ElectronEgg</h1>
+  <p>一个简单易用、跨平台、企业级的桌面软件开发框架</p>
 </div>
 
-<div align=center>
-<h3><strong>An easy to get started, cross platform, enterprise level desktop software development framework</strong></h3>
+## 📖 项目简介
+
+ElectronEgg 是基于 Electron 和 Vue 3 构建的现代化桌面应用开发框架。它提供了完整的开发工具链和最佳实践，帮助开发者快速构建高质量的跨平台桌面应用程序。
+
+## ✨ 核心特性
+
+- **🚀 跨平台支持** - 一套代码可打包为 Windows、macOS、Linux 版本，支持国产操作系统（UOS、Deepin、麒麟等）
+- **🎯 现代化技术栈** - 基于 Electron 31.x + Vue 3 + Vite 构建，提供优秀的开发体验
+- **📦 开箱即用** - 内置完整的项目结构、构建配置和开发工具
+- **🔧 模块化架构** - 支持单业务进程/模块化/多任务（进程、线程、渲染进程）架构
+- **🛡️ 安全保障** - 支持字节码加密、压缩和混淆加密，保护代码安全
+- **📊 企业级功能** - 集成数据库、插件系统、自动更新、打包工具等企业级功能
+
+## 🏗️ 技术架构
+
+```
+electron-egg/
+├── electron/          # Electron 主进程代码
+│   ├── main.js       # 应用入口
+│   ├── config/       # 配置文件
+│   ├── controller/    # 控制器
+│   ├── service/      # 服务层
+│   └── preload/      # 预加载脚本
+├── frontend/         # 前端代码（Vue 3）
+│   ├── src/         # 源码目录
+│   ├── package.json  # 前端依赖
+│   └── vite.config.js # Vite 配置
+├── public/          # 静态资源
+└── package.json     # 项目配置
+```
+
+## 🚀 快速开始
+
+### 环境要求
+
+- Node.js >= 16.x
+- npm >= 8.x
+
+### 安装依赖
+
+```bash
+# 安装项目依赖
+npm install
+
+# 安装前端依赖
+cd frontend
+npm install
+cd ..
+```
+
+### 开发模式
+
+```bash
+# 启动完整开发环境（前端 + Electron）
+npm run dev
+
+# 仅启动前端开发服务器
+npm run dev-frontend
+
+# 仅启动 Electron 开发模式
+npm run dev-electron
+```
+
+### 构建项目
+
+```bash
+# 构建完整项目
+npm run build
+
+# 仅构建前端
+npm run build-frontend
+
+# 仅构建 Electron
+npm run build-electron
+
+# 平台特定构建
+npm run build-w    # Windows
+npm run build-m    # macOS
+npm run build-l    # Linux
+```
+
+## 📚 核心功能
+
+### 前端技术栈
+- **框架**: Vue 3 + Vue Router
+- **UI 组件**: Arco Design Vue
+- **构建工具**: Vite
+- **样式**: Less
+
+### Electron 功能
+- **主进程管理**: 基于 ee-core 框架
+- **进程通信**: 完善的 IPC 通信机制
+- **生命周期**: 完整的应用生命周期管理
+- **插件系统**: 可扩展的插件架构
+
+### 数据库支持
+- **SQLite**: 集成 better-sqlite3
+- **数据管理**: 内置数据库操作工具
+
+### 多媒体处理
+- **视频处理**: 集成 fluent-ffmpeg
+- **音频处理**: 支持音视频时长获取
+
+## 🎯 应用场景
+
+ElectronEgg 已成功应用于多个行业领域：
+
+- **📊 企业管理软件** - ERP、CRM、OA 系统
+- **🏥 医疗健康** - 医疗管理、健康监测
+- **🎓 教育培训** - 在线教育、学习工具
+- **💼 政务办公** - 政府信息化系统
+- **🎮 娱乐游戏** - H5 游戏、娱乐应用
+- **📈 金融交易** - 股票交易、金融工具
+
+## 🔧 开发指南
+
+### 项目结构说明
+
+- `electron/main.js` - Electron 应用入口
+- `electron/config/` - 配置文件目录
+- `electron/controller/` - 业务控制器
+- `electron/service/` - 服务层逻辑
+- `frontend/src/` - Vue 前端源码
+- `public/electron/` - Electron 静态资源
+
+### 添加新功能
+
+1. **添加前端页面**: 在 `frontend/src/` 目录下创建 Vue 组件
+2. **添加后端接口**: 在 `electron/controller/` 创建控制器
+3. **配置路由**: 更新前端路由配置
+4. **进程通信**: 使用 IPC 进行前后端通信
+
+### 自定义配置
+
+修改 `electron/config/` 目录下的配置文件来自定义应用行为。
+
+## 🤝 社区支持
+
+- **官方文档**: [https://www.kaka996.com/](https://www.kaka996.com/)
+- **GitHub**: [https://github.com/dromara/electron-egg](https://github.com/dromara/electron-egg)
+- **Gitee**: [https://gitee.com/dromara/electron-egg](https://gitee.com/dromara/electron-egg)
+
+## 📄 许可证
+
+本项目基于 Apache 2.0 许可证开源 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 🙏 致谢
+
+感谢所有为 ElectronEgg 项目做出贡献的开发者！
+
+---
+
+<div align="center">
+  <p>如果这个项目对你有帮助，请给个 ⭐️ 支持一下！</p>
 </div>
-<br>
-
-<!-- ## 🌏 [English](https://www.yuque.com/u34495/ee-doc) | [中文](https://www.kaka996.com/) -->
-
-## 📋 Introduction
-
-> The framework has been widely applied to the clients in various fields such as bookkeeping, government affairs, enterprises, healthcare, schools, stock trading, ERP, entertainment, and video. Please feel free to use it!
-
-## 👦 Who can use it?
-
-The project already has 5 communication groups, covering developers proficient in `frontend`, `Java`, `Go`, `Python`, `PHP`, etc.
-
-Whether you're a frontend developer, backend developer, operations engineer, game developer, or focused on clientside development, you can get started quickly.
-
-## 🐶 showcase
-
-- [**Click to view**](#project-case)
-
-## 📺 feature
-- 🍩 **Why use...？** Desktop software (in the areas of office work and personal tools) will remain one of the demands on the PC side in the next decade or so, and it can improve work efficiency.
-- 🍉 **simple：** support js、ts 
-- 🍑 **vision：** All developers can learn to develop desktop software.
-- 🍰 **gitee：** https://gitee.com/dromara/electron-egg **5600+**
-- 🍨 **github：** https://github.com/dromara/electron-egg **2600+**
-- 🍰 **gitcode：** https://gitcode.com/dromara/electron-egg 
-- 🏆 The Most Valuable Open - source Projects on Gitee
-    ![](./public/images/example/ee-zs.png) 
-    ![](./public/images/example/ee-zs2.jpg)     
-
-## 📚 document
-- Quick experience：[Tutorial](https://www.kaka996.com/)
-    ![](./public/images/example/v3-home.png) 
-
-## 📦 characteristic
-1. 🍄 Cross platform: One set of code can be packaged into Windows, Mac, Linux versions, as well as domestic versions like UOS, Deepin, and Kylin.
-2. 🌹 Architecture: Single - business process / modular / multi - task (process, thread, rendering process), which simplifies the development of large - scale projects.
-3. 🌱 Simple and efficient: Supports JavaScript (js) and TypeScript (ts).
-4. 🌴 Independent frontend: Theoretically supports any frontend technology, such as Vue, React, HTML, etc.
-5. 🍁 Engineering oriented: Desktop software can be developed using the development concepts of frontend and backend.
-6. 🌷 High performance: Event driven, non blocking I/O.
-7. 🌰 Rich in functions: Configuration, communication, plugins, database, upgrade, packaging, tools... everything is available.
-8. 💐 Secure: Supports bytecode encryption, compression, and obfuscation encryption.
-9. 🌻 Function demos: Common functions of desktop software, with the framework integrating or providing demos. 
-
-## ✈️ use case
-
-### 1. 🚀 conventional desktop software
-- 🚖 windows
-
-    ![](./public/images/example/ee-win-home.png)
-
-- 🚍 macOS    
-    ![](./public/images/example/ee-mac-home.png)
-
-- 🚔 linux - UOS、Deepin
-    ![](./public/images/example/uos-home.png)
-
-- 🚔 linux - ubuntu
-    ![](./public/images/example/ubuntu-db.png)
-
-### 🚐 2. vue、react、angular、web, convert into desktop software
-- 🚙 vue-ant-design（local）
-
-    ![](./public/images/example/vue-antd.png)
-
-- 🚙 zendao（web url）
-
-    ![](./public/images/example/ee-project-7.png)
-
-### 🚂 3. game（development related to H5 technologies）
-- 🚊 Ninja 100 Floors
-
-    ![](./public/images/example/ee_game_1.png)
-
-
-## 📒 start using
-
-- ✒️ [Installation document](https://www.kaka996.com/pages/e64ff6/)
-    
-## project-case
-- 🐟 The framework has been applied to the clients in various fields, including healthcare, education, government affairs, stock trading, ERP, entertainment, video, and enterprises.
-
-### 🐸 knowledge note
-
-- [gaiyan](https://gaiyan.net?from=electron-egg) 
-![](./public/images/example/gaiyan-1.jpg)
-![](./public/images/example/gaiyan-2.png)
-
-### 🐸 remote control
-
-- RQ Center
-![](./public/images/example/rq-1.png)
-![](./public/images/example/rq-2.png)
-
-### 🐸 cloud drive
-
-- FM Cloud
-![](./public/images/example/fm-p2.png)
-![](./public/images/example/fm-p1.png)
-![](./public/images/example/fm-p4.png)
-
-### 🐸 IM
-
-- Cede IM
-![](./public/images/example/im-p1.png)
-![](./public/images/example/im-p5.png)
-![](./public/images/example/im-p1.png)
-
-### 🐸 wallpaper
-
-- warpar
-![](./public/images/example/aw-3.png)
-
-### 🐸 League of Legends Helper
-
-- Serendlplty
-![](./public/images/example/lol-zhanji.png)
-
-### 🐸 more
-
-- [More cases](https://www.kaka996.com/pages/eadf46/)
-
-## 💬 communication
-1. [discuss](https://www.kaka996.com/pages/c2720e/)
-
-## 📌 about pr
-Please go to the[GitHub project](https://github.com/dromara/electron-egg)to submit a PR（to avoid the PR being overwritten after the code is synchronized). Thank you!
-
-Website address: https://github.com/dromara/electron-egg
-
-## 📔 Framework core package: ee-core
-ee-core：[https://github.com/wallace5303/ee-core](https://github.com/wallace5303/ee-core)
-
-## 📚 Dromara member projects
-
-<p align="center">
-<a href="https://gitee.com/dromara/TLog" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/tlog2.png" title="一个轻量级的分布式日志标记追踪神器，10分钟即可接入，自动对日志打标签完成微服务的链路追踪" width="15%">
-</a>
-<a href="https://gitee.com/dromara/liteFlow" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/liteflow.png" title="轻量，快速，稳定，可编排的组件式流程引擎" width="15%">
-</a>
-<a href="https://hutool.cn/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/hutool.jpg" title="小而全的Java工具类库，使Java拥有函数式语言般的优雅，让Java语言也可以“甜甜的”。" width="15%">
-</a>
-<a href="https://sa-token.dev33.cn/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/sa-token.png" title="一个轻量级 java 权限认证框架，让鉴权变得简单、优雅！" width="15%">
-</a>
-<a href="https://gitee.com/dromara/hmily" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/hmily.png" title="高性能一站式分布式事务解决方案。" width="15%">
-</a>
-<a href="https://gitee.com/dromara/Raincat" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/raincat.png" title="强一致性分布式事务解决方案。" width="15%">
-</a>
-</p>
-<p align="center">
-<a href="https://gitee.com/dromara/myth" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/myth.png" title="可靠消息分布式事务解决方案。" width="15%">
-</a>
-<a href="https://cubic.jiagoujishu.com/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/cubic.png" title="一站式问题定位平台，以agent的方式无侵入接入应用，完整集成arthas功能模块，致力于应用级监控，帮助开发人员快速定位问题" width="15%">
-</a>
-<a href="https://maxkey.top/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/maxkey.png" title="业界领先的身份管理和认证产品" width="15%">
-</a>
-<a href="http://forest.dtflyx.com/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/forest-logo.png" title="Forest能够帮助您使用更简单的方式编写Java的HTTP客户端" width="15%">
-</a>
-<a href="https://jpom.io/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/jpom.png" title="一款简而轻的低侵入式在线构建、自动部署、日常运维、项目监控软件" width="15%">
-</a>
-<a href="https://su.usthe.com/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/sureness.png" title="面向 REST API 的高性能认证鉴权框架" width="15%">
-</a>
-</p>
-<p align="center">
-<a href="https://easy-es.cn/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/easy-es2.png" title="傻瓜级ElasticSearch搜索引擎ORM框架" width="15%">
-</a>
-<a href="https://gitee.com/dromara/northstar" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/northstar_logo.png" title="Northstar盈富量化交易平台" width="15%">
-</a>
-<a href="https://hertzbeat.com/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/hertzbeat_brand.jpg" title="易用友好的云监控系统" width="15%">
-</a>
-<a href="https://plugins.sheng90.wang/fast-request/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/fast-request.gif" title="Idea 版 Postman，为简化调试API而生" width="15%">
-</a>
-<a href="https://www.jeesuite.com/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/mendmix.png" title="开源分布式云原生架构一站式解决方案" width="15%">
-</a>
-<a href="https://gitee.com/dromara/koalas-rpc" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/koalas-rpc2.png" title="企业生产级百亿日PV高可用可拓展的RPC框架。" width="15%">
-</a>
-</p>
-<p align="center">
-<a href="https://async.sizegang.cn/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/gobrs-async.png" title="配置极简功能强大的异步任务动态编排框架" width="15%">
-</a>
-<a href="https://dynamictp.cn/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/dynamic-tp.png" title="基于配置中心的轻量级动态可监控线程池" width="15%">
-</a>
-<a href="https://www.x-easypdf.cn" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/x-easypdf.png" title="一个用搭积木的方式构建pdf的框架（基于pdfbox）" width="15%">
-</a>
-<a href="http://dromara.gitee.io/image-combiner" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/image-combiner.png" title="一个专门用于图片合成的工具，没有很复杂的功能，简单实用，却不失强大" width="15%">
-</a>
-<a href="https://www.herodotus.cn/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/dante-cloud2.png" title="Dante-Cloud 是一款企业级微服务架构和服务能力开发平台。" width="15%">
-</a>
-<a href="https://dromara.org/zh/projects/" target="_blank">
-<img src="https://oss.dev33.cn/sa-token/link/dromara.png" title="让每一位开源爱好者，体会到开源的快乐。" width="15%">
-</a>
-</p>
