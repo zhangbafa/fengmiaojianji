@@ -41,6 +41,7 @@ jobs:
         cache: 'npm'
         
     - name: Install dependencies
+      shell: bash
       run: |
         npm ci
         # Use npm ci in frontend if a lockfile exists, otherwise fall back to npm install
