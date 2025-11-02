@@ -1,132 +1,54 @@
-name: Build and Release ElectronEgg
+name: Build/release Electron app
 
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
+      - v*.*.*
 
-env:
-  NODE_VERSION: '18'
+permissions:
+  contents: write
 
 jobs:
-  build:
+  release:
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        platform: [windows-latest, macos-latest, ubuntu-latest]
-        include:
-          - platform: windows-latest
-            build_cmd: build-w
-            artifact_name: electron-egg-windows-x64.exe
-            file_pattern: "*.exe"
-          - platform: macos-latest
-            build_cmd: build-m
-            artifact_name: electron-egg-macos-x64.dmg
-            file_pattern: "*.dmg"
-          - platform: ubuntu-latest
-            build_cmd: build-l
-            artifact_name: electron-egg-linux-x64.deb
-            file_pattern: "*.deb"
-    
-    runs-on: ${{ matrix.platform }}
-    
+        os: [windows-latest]
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        
-    - name: Install dependencies
-      shell: bash
-      run: |
-        npm ci
-        # Use npm ci in frontend if a lockfile exists, otherwise fall back to npm install
-        if [ -f frontend/package-lock.json ] || [ -f frontend/npm-shrinkwrap.json ]; then
-          cd frontend && npm ci && cd ..
-        else
-          cd frontend && npm install && cd ..
-        fi
-        
-    - name: Build frontend
-      run: npm run build-frontend
-      
-    - name: Install Linux dependencies
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libnss3-dev libatk-bridge2.0-dev libxss1 libxrandr2 libasound2
-        
-    - name: Build Electron app
-      run: npm run ${{ matrix.build_cmd }}
-        
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: electron-egg-${{ matrix.platform }}
-        path: out/
-        retention-days: 7
-        
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: artifacts
-        
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        name: ElectronEgg ${{ github.ref_name }}
-        draft: false
-        prerelease: false
-        body: |
-          ElectronEgg Desktop Application Release
-          
-          This release contains builds for:
-          - Windows (x64)
-          - macOS (Intel x64)
-          - Linux (x64)
-          
-          ### Installation Instructions
-          
-          **Windows**: Download the `.exe` file and run the installer.
-          
-          **macOS**: Download the `.dmg` file, mount it, and drag the app to Applications folder.
-          
-          **Linux**: Download the `.deb` file and install with:
-          ```bash
-          sudo dpkg -i electron-egg-linux-x64.deb
-          ```
-        
-    - name: Upload Release Assets
-      run: |
-        # Upload Windows asset
-        if [ -f "artifacts/electron-egg-windows-latest/out/*.exe" ]; then
-          gh release upload ${{ github.ref }} artifacts/electron-egg-windows-latest/out/*.exe --clobber
-        fi
-        
-        # Upload macOS asset
-        if [ -f "artifacts/electron-egg-macos-latest/out/*.dmg" ]; then
-          gh release upload ${{ github.ref }} artifacts/electron-egg-macos-latest/out/*.dmg --clobber
-        fi
-        
-        # Upload Linux asset
-        if [ -f "artifacts/electron-egg-ubuntu-latest/out/*.deb" ]; then
-          gh release upload ${{ github.ref }} artifacts/electron-egg-ubuntu-latest/out/*.deb --clobber
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: build-sqlite3
+        run: npm run resqlite
+
+      - name: build-win
+        if: matrix.os == 'windows-latest'
+        run: npm run build:win
+
+      - name: release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: |
+            out/*.exe        
+            out/*.zip  
+            out/*.dmg    
+            out/*.AppImage  
+            out/*.snap  
+            out/*.deb  
+            out/*.rpm  
+            out/*.tar.gz  
+            out/*.yml  
+            out/*.blockmap  
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
