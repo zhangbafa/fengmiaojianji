@@ -2,7 +2,6 @@ node_modules
 out/
 logs/
 run/
-build/
 .idea/
 data/
 .vscode/launch.json
