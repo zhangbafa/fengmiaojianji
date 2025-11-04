@@ -2,8 +2,11 @@ name: Build and Release (Electron-Egg)
 
 on:
   push:
-    branches: [main] # 👈 改为 main 分支触发
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: write   # ✅ 允许创建 release、上传产物
 
 jobs:
   build:
@@ -42,20 +45,15 @@ jobs:
 
       - name: Check output directories
         run: |
-          echo "=== Checking build output ==="
-          ls -R release || true
-          ls -R public/electron/build || true
-          ls -R dist || true
+          echo "=== Checking out directory ==="
+          ls -R out || true
 
       - name: Upload packaged app
         uses: actions/upload-artifact@v4
         with:
           name: fengmiaojianji-${{ matrix.os }}
-          path: |
-            release/**
-            public/electron/build/**
-            dist/**
-          if-no-files-found: warn
+          path: out/**
+          if-no-files-found: error
 
   release:
     needs: build
@@ -70,18 +68,12 @@ jobs:
         with:
           path: ./artifacts
 
-      # 🏷️ 自动生成 tag 名称，例如 v2025.11.04-123456
+      # 🏷️ 自动生成唯一 tag 名称
       - name: Generate tag name
         id: tag
         run: echo "TAG_NAME=v$(date +'%Y.%m.%d-%H%M%S')" >> $GITHUB_ENV
 
-      # 🔖 创建并推送 tag
-      - name: Create and push tag
-        run: |
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
-
-      # 🚀 创建 GitHub Release
+      # 🚀 创建 GitHub Release（自动使用 token）
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
