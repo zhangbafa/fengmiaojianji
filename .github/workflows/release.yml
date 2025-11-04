@@ -55,20 +55,21 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: npm run build-l
 
+      - name: List build artifacts
+        run: ls -la out/
+
+      - name: List build artifacts
+        run: ls -la out/
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
           draft: true
           files: |
             out/*.exe
-            out/*.zip
             out/*.dmg
             out/*.AppImage
-            out/*.snap
             out/*.deb
             out/*.rpm
-            out/*.tar.gz
-            out/*.yml
-            out/*.blockmap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
