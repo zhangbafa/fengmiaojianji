@@ -61,15 +61,26 @@ jobs:
       - name: List build artifacts
         run: ls -la out/
 
+      - name: Find executable files
+        run: |
+          echo "=== Windows files ==="
+          find out/ -name "*.exe" -type f
+          echo "=== macOS files ==="
+          find out/ -name "*.dmg" -type f
+          echo "=== Linux files ==="
+          find out/ -name "*.AppImage" -type f
+          find out/ -name "*.deb" -type f
+          find out/ -name "*.rpm" -type f
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
           draft: true
           files: |
-            out/ee-*.exe
-            out/ee-*.dmg
-            out/ee-*.AppImage
-            out/ee-*.deb
-            out/ee-*.rpm
+            out/*.exe
+            out/*.dmg
+            out/*.AppImage
+            out/*.deb
+            out/*.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
