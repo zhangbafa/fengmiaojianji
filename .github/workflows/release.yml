@@ -66,10 +66,10 @@ jobs:
         with:
           draft: true
           files: |
-            out/*.exe
-            out/*.dmg
-            out/*.AppImage
-            out/*.deb
-            out/*.rpm
+            out/ee-*.exe
+            out/ee-*.dmg
+            out/ee-*.AppImage
+            out/ee-*.deb
+            out/ee-*.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
