@@ -2,8 +2,7 @@ name: Build and Release (Electron-Egg)
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main] # 👈 改为 main 分支触发
   workflow_dispatch:
 
 jobs:
@@ -44,8 +43,8 @@ jobs:
       - name: Check output directories
         run: |
           echo "=== Checking build output ==="
-          ls -R public/electron || true
           ls -R release || true
+          ls -R public/electron/build || true
           ls -R dist || true
 
       - name: Upload packaged app
@@ -63,16 +62,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
 
+      # 🏷️ 自动生成 tag 名称，例如 v2025.11.04-123456
+      - name: Generate tag name
+        id: tag
+        run: echo "TAG_NAME=v$(date +'%Y.%m.%d-%H%M%S')" >> $GITHUB_ENV
+
+      # 🔖 创建并推送 tag
+      - name: Create and push tag
+        run: |
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+
+      # 🚀 创建 GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: "Release ${{ env.TAG_NAME }}"
+          body: "Auto release from main branch."
           files: artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
