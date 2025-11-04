@@ -2,8 +2,7 @@ name: Build and Release Electron App
 
 on:
   push:
-    tags:
-      - "v*"     # 例如 v1.0.0 时触发发布
+    branches: [main]     # 例如 v1.0.0 时触发发布
   workflow_dispatch:  # 也可以手动触发
 
 jobs:
