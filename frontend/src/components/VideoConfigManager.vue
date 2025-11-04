@@ -1,9 +1,13 @@
 <template>
     <div>
-      <div style="margin-bottom: 16px;display: flex;justify-content: flex-start;">
+      <div style="margin-bottom: 16px;display: flex;justify-content: space-between;align-items: center;">
         <a-button @click="handleAddConfig" type="primary">
         新建配置
       </a-button>
+      <div style="font-size: 12px">
+        有效期: {{ indate }} 
+        <a-link style="font-size: 12px;" @click="handleXufei">续费</a-link>
+      </div>
       </div>
       <a-table 
         :data="configList" 
@@ -264,10 +268,15 @@ import { Message, Modal } from '@arco-design/web-vue'
 import { ipcApiRoute } from '@/api';
 import { ipc } from '@/utils/ipcRenderer';
 // 检查pywebview是否可用
-const pywebviewAvailable = ref(false)
+const indate = ref('')
 
 onMounted(async() => {
   fetchConfigs()
+  const machineID =  await ipc.invoke(ipcApiRoute.getMachineId) 
+  const result = await ipc.invoke(ipcApiRoute.fetchUserInfo,{macid:machineID})
+  if(result && result.success && !result.isExpired){
+    indate.value = result.indate
+  }
   
 })
 
@@ -523,16 +532,6 @@ const handleConfirmGenerateVideo = async () => {
 
 // 获取批量进度
 const updateVideoProgress = async (progress) => {
-  console.log(progress)
-    if(progress.status=='success'){
-      modalGenerateProgress.value = progress.index / modalGenerateCount.value
-    }else{
-      modalGenerateError.value ++
-    }
-    
-    if(modalGenerateCount.value == progress.index){
-      modalGenerateLoading.value = false
-    }
 }
 const handleCloseGenerateVideo = () => {
   modalGenerateVisible.value = false
@@ -553,6 +552,10 @@ function formatTime(ms) {
   } else {
     return `${totalSeconds.toFixed(1)}秒`; // 不足1分钟时保留1位小数
   }
+}
+
+const handleXufei=async ()=>{
+  await ipc.invoke(ipcApiRoute.openExternal,'http://baidu.com')
 }
 </script>
 

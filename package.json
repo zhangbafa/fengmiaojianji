@@ -14,7 +14,7 @@
     "encrypt": "ee-bin encrypt",
     "icon": "ee-bin icon",
     "re-sqlite": "electron-rebuild -f -w better-sqlite3",
-  "resqlite": "npm run re-sqlite",
+    "resqlite": "npm run re-sqlite",
     "build-w": "ee-bin build --cmds=win64",
     "build-we": "ee-bin build --cmds=win_e",
     "build-m": "ee-bin build --cmds=mac",
@@ -35,7 +35,8 @@
     "debug": "^4.4.0",
     "ee-bin": "^4.1.10",
     "electron": "^31.7.6",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "icon-gen": "^5.0.0"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",

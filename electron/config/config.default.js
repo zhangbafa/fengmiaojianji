@@ -11,9 +11,9 @@ module.exports = () => {
     openDevTools: false,
     singleLock: true,
     windowsOption: {
-      title: '速剪',
-      width: 980,
-      height: 650,
+      title: '流光剪辑',
+      width: 500,
+      height: 550,
       minWidth: 400,
       minHeight: 300,
       webPreferences: {

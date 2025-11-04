@@ -8,7 +8,13 @@ const ipcApiRoute = {
   generateMultipleVideos: 'controller/example/generateMultipleVideos',
   deleteConfig: 'controller/example/deleteConfig',
   saveConfig: 'controller/example/saveConfig',
-  updateConfig: 'controller/example/updateConfig'
+  updateConfig: 'controller/example/updateConfig',
+  getMachineId: 'controller/example/getMachineId',
+  fetchUserInfo: 'controller/example/fetchUserInfo',
+  loginByMachineID: 'controller/example/loginByMachineID',
+  loginWindow: 'controller/effect/loginWindow',
+  restoreWindow: 'controller/effect/restoreWindow',
+  openExternal: 'controller/effect/openExternal',
 }
 
 export {

@@ -3,13 +3,37 @@
 const { exampleService } = require('../service/example');
 const { sqlitedbService } = require('../service/database/sqlitedb');
 const OptimizedVideoProcessor = require('./videoProcessor');
-
+const Utils = require('ee-core/utils');
+const fetch = require('node-fetch');
 /**
  * example
  * @class
  */
 class ExampleController {
 
+  async getMachineId() {
+    return Utils.machineIdSync({original: true})
+  }   
+
+  async fetchUserInfo(args,event){
+    const {macid} = args
+    const result = await fetch(`https://cdy.wolewan.com/api/cut/user?macid=${macid}`)
+    const data = await result.json()
+    return data
+  }
+  async loginByMachineID(args,event){
+    const {macid} = args
+    const result = await fetch(`https://cdy.wolewan.com/api/cut/user`,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({macid:macid})
+    })
+    const data = await result.json()
+    return data
+    
+  }
   /**
    * 所有方法接收两个参数
    * @param args 前端传的参数
@@ -74,6 +98,7 @@ class ExampleController {
       // const forceRefresh = false
       const results = await processor.generateMultipleVideos(count, output_video, file_prefix, force_refresh, (videoFiles, subtitleFiles, audioFiles, totalDurations) => {
         console.log(videoFiles, subtitleFiles, audioFiles, totalDurations)
+        sqlitedbService.updateVideoMeta(videoFiles, subtitleFiles, audioFiles, totalDurations, id)
       }, (index) => {
         let timeNow = Date.now();
         let data = index + ':' + timeNow;
