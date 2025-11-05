@@ -31,7 +31,7 @@ module.exports = () => {
       outputJSON: false,
       appLogName: 'ee.log',
       coreLogName: 'ee-core.log',
-      errorLogName: 'ee-error.log' 
+      errorLogName: 'ee-error.log'
     },
     remote: {
       enable: false,
@@ -54,7 +54,7 @@ module.exports = () => {
     httpServer: {
       enable: false,
       https: {
-        enable: false, 
+        enable: false,
         key: '/public/ssl/localhost+1.key',
         cert: '/public/ssl/localhost+1.pem'
       },
@@ -64,6 +64,17 @@ module.exports = () => {
     mainServer: {
       indexPath: '/public/dist/index.html',
       channelSeparator: '/',
+    },
+    autoUpdater: {
+      enable: true,
+      windows: false,
+      macOS: false,
+      linux: false,
+      options: {
+        provider: 'generic',
+        url: 'http://kodo.qiniu.com/'
+      },
+      force: false,
     }
   }
 }
