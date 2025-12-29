@@ -5,6 +5,7 @@ run/
 .idea/
 data/
 build/
+
 .vscode/launch.json
 public/electron/
 pnpm-lock.yaml

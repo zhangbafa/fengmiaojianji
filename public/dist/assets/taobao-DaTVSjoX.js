@@ -1,0 +1,1 @@
+import{_ as e,a,m as t,w as n,b as s,g as r}from"./index-Dcit1WPZ.js";const o=e({},[["render",function(e,o){const i=a("a-watermark");return r(),t(i,{content:"开发中 敬请期待"},{default:n(()=>[...o[0]||(o[0]=[s("div",{style:{width:"100vw",height:"100vh"}},null,-1)])]),_:1})}],["__file","/Users/zhang1/zhang/Douyin-swiper-electron-egg/frontend/src/views/taobao.vue"]]);export{o as default};
