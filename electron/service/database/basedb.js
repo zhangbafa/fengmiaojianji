@@ -28,7 +28,6 @@ class BasedbService {
     }
     this.storage = new SqliteStorage(dbFile, sqliteOptions);
     this.db = this.storage.db;
-    console.log('sqlite3333')
   }
 
   /*

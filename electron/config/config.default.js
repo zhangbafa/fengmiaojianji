@@ -22,8 +22,9 @@ module.exports = () => {
         nodeIntegration: true,
         //preload: path.join(getElectronDir(), 'preload', 'bridge.js'),
       },
-      frame: true,
+      
       show: true,
+      
       icon: path.join(getBaseDir(), 'public', 'images', 'logo-32.png'),
     },
     logger: {

@@ -5,30 +5,41 @@ const { sqlitedbService } = require('../service/database/sqlitedb');
 const OptimizedVideoProcessor = require('./videoProcessor');
 const Utils = require('ee-core/utils');
 const fetch = require('node-fetch');
+// import fetch from 'node-fetch';
 /**
  * example
  * @class
  */
 class ExampleController {
-
+  constructor() {
+    this.Url = 'https://edgeone.code500.cn';
+    this.XAppSecret = 'livehelp_swiper_2025';
+  }
   async getMachineId() {
     return Utils.machineIdSync({original: true})
   }   
 
   async fetchUserInfo(args,event){
-    const {macid} = args
-    const result = await fetch(`https://cdy.wolewan.com/api/cut/user?macid=${macid}`)
+    const machine_id = Utils.machineIdSync({original: true})
+    // const {machine_id} = args
+    const result = await fetch(`${this.Url}/api/livehelp/check/status?machine_id=${machine_id}`,{
+       headers: {
+        'X-App-Secret': this.XAppSecret
+      },
+    })
     const data = await result.json()
     return data
   }
   async loginByMachineID(args,event){
-    const {macid} = args
-    const result = await fetch(`https://cdy.wolewan.com/api/cut/user`,{
+    // const {machine_id} = args
+    const machine_id = await Utils.machineIdSync({original: true})
+    const result = await fetch(`${this.Url}/api/livehelp/machine-login`,{
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-App-Secret': this.XAppSecret
       },
-      body: JSON.stringify({macid:macid})
+      body: JSON.stringify({machine_id:machine_id})
     })
     const data = await result.json()
     return data

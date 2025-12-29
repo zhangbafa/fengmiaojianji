@@ -1,92 +1,54 @@
-name: Build and Release (Electron-Egg)
+name: Build/release Electron app
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    tags:
+      - v*.*.*
 
 permissions:
-  contents: write   # ✅ 允许创建 release、上传产物
+  contents: write
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-
+  release:
     runs-on: ${{ matrix.os }}
 
+    strategy:
+      matrix:
+        os: [windows-latest]
+
     steps:
-      - name: Checkout repository
+      - name: Check out Git repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Build base project (frontend + electron)
-        run: npm run build
+      - name: build-sqlite3
+        run: npm run resqlite
 
-      - name: Package Electron app by platform
-        shell: bash
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            npm run build-w || exit 1
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            npm run build-m || exit 1
-          else
-            npm run build-l || exit 1
-          fi
+      - name: build-win
+        if: matrix.os == 'windows-latest'
+        run: npm run build:win
 
-      - name: Check output directories
-        run: |
-          echo "=== Checking out directory ==="
-          ls -R out || true
-
-      - name: Upload packaged app
-        uses: actions/upload-artifact@v4
+      - name: release
+        uses: softprops/action-gh-release@v1
         with:
-          name: fengmiaojianji-${{ matrix.os }}
-          path: out/**
-          if-no-files-found: error
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./artifacts
-
-      # 🏷️ 自动生成唯一 tag 名称
-      - name: Generate tag name
-        id: tag
-        run: echo "TAG_NAME=v$(date +'%Y.%m.%d-%H%M%S')" >> $GITHUB_ENV
-
-      # 🚀 创建 GitHub Release（自动使用 token）
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          name: "Release ${{ env.TAG_NAME }}"
-          body: "Auto release from main branch."
+          draft: true
           files: |
-            artifacts/**/*.exe
-            artifacts/**/*.dmg
-            artifacts/**/*.zip
-            artifacts/**/*.AppImage
-            artifacts/**/*.deb
-            artifacts/**/*.rpm
-            artifacts/**/*.blockmap
+            dist/*.exe
+            dist/*.zip
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.snap
+            dist/*.deb
+            dist/*.rpm
+            dist/*.tar.gz
+            dist/*.yml
+            dist/*.blockmap
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}

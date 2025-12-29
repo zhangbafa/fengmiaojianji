@@ -11,4 +11,9 @@ if (loadingElement) {
 }
 });
 </script>
-<style lang="less"></style>
+<style lang="less">
+html,body{
+  height: 100%;
+  margin: 0;
+}
+</style>
