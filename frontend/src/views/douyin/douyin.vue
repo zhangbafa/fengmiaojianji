@@ -121,6 +121,7 @@
         </a-col>
       </a-row>
     </a-form>
+    <div style="height: 20px;"></div>
   </div>
 </template>
 
@@ -267,7 +268,8 @@ const handleSaveConfigcreateWindow = async (index) => {
       width: 380,
       height: 180,
       transparent: true,
-      frame: false
+      frame: false,
+      openDevTools:false
     });
     loading.value = false
 
@@ -277,6 +279,6 @@ const handleSaveConfigcreateWindow = async (index) => {
 <style>
   .douyin-container{
     padding: 10px;
-    margin-bottom: 5px;
+    /* margin-bottom: 500px; */
   }
 </style>

@@ -1,16 +1,27 @@
 <template>
   <div class="swiper-container">
-    <div class="drag-placeholder">
+    <div class="drag-placeholder" style="position:relative">
+      <div class="drag-action">
+        <a-space>
+<a-button type="primary" shape="circle" @click="closeWindow">
+          <icon-close />
+        </a-button>
+        <a-button type="primary" shape="circle" @click="refreshPage">
+          <icon-refresh />
+        </a-button>
+        </a-space>
+        
+      </div>
       <swiper 
         :direction="direction" 
-        :slidesPerView="2" 
-        :slidesPerGroup="2" 
+        :slidesPerView="slidesPerView" 
+        :slidesPerGroup="slidesPerGroup" 
         :spaceBetween="0"
         :centeredSlides="false" 
         :loop="true" 
         :speed="speed"
-        :loopAdditionalSlides="4"
-        :loopedSlides="4"
+        :loopAdditionalSlides="loopAdditionalSlides"
+        :loopedSlides="loopedSlides"
         :autoplay="{
           delay: delay,
           disableOnInteraction: false,
@@ -18,8 +29,9 @@
         :modules="[Autoplay]" 
         @swiper="onSwiper" 
         @slideChange="onSlideChange"
-        class="mySwiper">
-      <swiper-slide v-for="(slide, index) in slides" :key="`slide-${index}`">
+        :class="['mySwiper', direction === 'horizontal' ? 'horizontal-swiper' : 'vertical-swiper',`line-${list?.lines}-style`]">
+         
+      <swiper-slide  v-for="(slide, index) in slides" :key="`slide-${index}`">
         <div class="slide-content">
           <div class="box">
             <div class="avatar">
@@ -29,9 +41,12 @@
               {{ prousername(slide.user) }}
               <span>***</span>
             </div>
-            <div class="say" v-if="slideModel == 'type1'">{{ slide.text }}</div>
-            <div class="good-1" v-if="slideModel == 'type2'">下单<span>1</span>号商品</div>
-            <div class="good-2" v-if="slideModel == 'type3'">抢购<span>1</span>号{{ title }}</div>
+            <!-- <div class="good-1" v-if="slideModel == 'xiadan'">下单<span>{{ slide.text }}</span>号商品</div>
+            <div class="good-2" v-if="slideModel == 'qianggou'">抢购<span>1</span>号{{ title }}</div>
+            <div class="say" v-if="slideModel == 'text'">{{ slide.text }}</div> -->
+            <div class="good-1" v-if="slideModel == 'xiadan'" v-html="slide.text"></div>
+            <div class="good-2" v-if="slideModel == 'qianggou'">{{ slide.text }}</div>
+            <div class="say" v-if="slideModel == 'text'">{{ slide.text }}</div>
           </div>
         </div>
       </swiper-slide>
@@ -47,7 +62,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Autoplay } from 'swiper/modules';
 import { ipcApiRoute } from "@/api";
 import { ipc } from "@/utils/ipcRenderer";
-import { getRandomItem, getRandomInt } from '@/utils/index.js'
+import { getRandomItem, getRandomInt,getRandomByProbability } from '@/utils/index.js'
 import users from '@/utils/users.js'
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -57,205 +72,121 @@ const prousername = (user) => {
 }
 const swiperInstance = ref(null);
 const slides = ref([]);
+
+const config = ref({
+  direction: 'vertical',
+  type: 'type2',
+  delay: 2,
+  speed: 0.5,
+  lines: 1,
+})
 const direction = ref('vertical')
 let slide = []
 const slideModel = ref()
 const title = ref()
 const speed = ref(500)
 const delay = ref(2000)
-let nextId = 0; // 用于生成不重复的 slide ID
 
-// 设置最大元素数量，防止内存泄漏
-const MAX_SLIDES = 50; // 最多保留50个元素（增加缓冲）
-const MIN_SLIDES = 20; // 最少保留20个元素
-const CLEANUP_THRESHOLD = 40; // 当超过40个时触发清理
-let cleanupTimer = null; // 清理定时器
-let isCleaningUp = ref(false); // 清理状态标记
+// 循环复用方案的配置
+const FIXED_SLIDES_COUNT = 30; // 固定100个元素，不再增删
+const UPDATE_TRIGGER_RATIO = 0.8; // 滚动到80%时触发更新
+let dataIndex = 0; // 数据索引计数器
+let hasUpdated = false; // 防止重复更新的标志位
 
+//
+const slidesPerView = ref(1)
+const slidesPerGroup = ref(1)
+const loopAdditionalSlides = ref(2)
+const loopedSlides = ref(2)
+const list = ref([])
 onMounted(async () => {
-  
-  // 定义更严谨的默认配置
-  const defaultConfig = {
-    content: '默认文本1\n默认文本2', // 确保是字符串类型，使用换行分隔
-    direction: 'vertical',
-    type: 'type2',
-    title: '默认标题',
-    speed: 0.5,
-    delay: 2,
-  };
   const douyinConfig = await ipc.invoke(ipcApiRoute.fineoneDouyinConfig);
-  
-  // 合并配置，确保所有必要字段存在且类型正确
-  const config = {
-    ...defaultConfig,
-    ...(douyinConfig || {}) // 只合并有效对象
-  };
-  
-  // 关键修复：确保content是字符串类型
-  let content = config.content.length>0
-    ? config.content 
-    : defaultConfig.content; // 如果不是字符串，使用默认值
-  // console.log(config)
-  // 处理内容
-  content = content.split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0);
-  // console.log(content)
+  console.log(douyinConfig)
+  list.value = douyinConfig;
   // 后续代码保持不变
-  slide = content;
-  direction.value = config.direction || defaultConfig.direction;
-  slideModel.value = config.type || defaultConfig.type;
-  title.value = config.title || defaultConfig.title;  
-  speed.value = (typeof config.speed === 'number' ? config.speed : defaultConfig.speed) * 1000;
-  delay.value = (typeof config.delay === 'number' ? config.delay : defaultConfig.delay) * 1000;
-  console.log(`speed:${delay.value}`)
-  
-  // 生成初始幻灯片（确保至少有 MIN_SLIDES 个元素）
-  const initialCount = Math.max(content.length, MIN_SLIDES);
-  for (let i = 0; i < initialCount; i++) {
-    const item = content[i % content.length]; // 循环使用内容
-    const imageUrl = new URL(
-      `../assets/douyin/new_user_grade_level_v1_${getRandomInt(1, 45)}.png`,
-      import.meta.url
-    ).href;
-    slides.value.push({ icon: imageUrl, user: getRandomItem(users), text: item })
+  if(douyinConfig) {
+    direction.value = douyinConfig.direction;
+    slideModel.value =  douyinConfig.type;
+    title.value = douyinConfig.title;  
+    speed.value = douyinConfig.speed * 1000;
+    delay.value = douyinConfig.delay * 1000;
+    for (let i = 0; i < FIXED_SLIDES_COUNT; i++) {
+      slides.value.push(generateSlideData());
+    }
+    // 初始化固定数量的元素（100个）
+    console.log(`[初始化] 创建 ${FIXED_SLIDES_COUNT} 个固定元素`);
   }
-  
+  // slide = content;
+  slidesPerView.value = douyinConfig.lines * 1;
+  slidesPerGroup.value = douyinConfig.lines * 1;
+  loopAdditionalSlides.value = 2 * douyinConfig.lines;
+  loopedSlides.value = 2 * douyinConfig.lines;
   nextTick(() => {
     swiperInstance.ref?.autoplay?.start();
   })
-  
-  // 启动定时清理任务，每60秒检查一次
-  cleanupTimer = setInterval(() => {
-    // 如果元素数量超过阈值且没有正在清理
-    if (slides.value.length > CLEANUP_THRESHOLD && !isCleaningUp.value) {
-      performCleanup();
-    }
-  }, 60000); // 每60秒执行一次
 })
 
 
 
-// 动态生成新元素
-const generateNewSlide = () => {
-  // 如果已达到最大数量，不再生成
-  if (slides.value.length >= MAX_SLIDES) {
-    console.log('[生成限制] 已达到最大元素数量，跳过生成');
-    return;
-  }
-  
+// 生成单个滑块数据
+const generateSlideData = () => {
+  // const item = slide[dataIndex % slide.length];
   const imageUrl = new URL(
     `../assets/douyin/new_user_grade_level_v1_${getRandomInt(1, 45)}.png`,
     import.meta.url
   ).href;
-  const newSlide = { icon: imageUrl, user: getRandomItem(users), text: getRandomItem(slide) }
-  slides.value.push(newSlide);
+  
+  dataIndex++; // 递增数据索引
+  // list.value.push(item);
+  // console.log(`[生成数据] 索引: ${dataIndex}, 生成数据: ${item}`);
+  
+  // getRandomByProbability
+  let text = ''
+  let item = ''
+  let a = ''
+  switch (slideModel.value) {
+    case 'xiadan':
+      a = JSON.parse(list.value.goods);
+      item = getRandomByProbability(a);
+      text = `下单<span class="dynamic-span">${item}</span>号商品`;
+      break;
+    case 'qianggou':
+      a = JSON.parse(list.value.qiang_goods);
+      item = getRandomByProbability(a);
+      text = item;
+      break;
+    case 'text':
+      a = JSON.parse(list.value.ad_text);
+      item = getRandomByProbability(a);
+      text = item;
+      break;
+  }
+  return {
+    icon: imageUrl,
+    user: getRandomItem(users),
+    text: text,
+    id: dataIndex // 添加唯一ID用于追踪
+  };
 };
 
-// 执行清理操作
-const performCleanup2 = () => {
-  if (!swiperInstance.ref || isCleaningUp.value) return;
+// 更新前面的元素数据（循环复用）
+const updateFrontSlides = (currentIndex) => {
+  // 更新所有元素，确保每一轮数据都是全新的
+  const updateCount = FIXED_SLIDES_COUNT; // 更新全部元素
   
-  isCleaningUp.value = true;
-  console.log('[开始清理] 当前元素数量：', slides.value.length);
+  console.log(`[循环复用] 当前索引: ${currentIndex}, 更新全部 ${updateCount} 个元素的数据`);
   
-  // 暂停自动播放
-  const wasPlaying = swiperInstance.ref?.autoplay?.running;
-  if (wasPlaying) {
-    swiperInstance.ref?.autoplay?.stop();
+  // 更新所有元素的数据（不改变DOM，只改变数据）
+  for (let i = 0; i < updateCount; i++) {
+    const newData = generateSlideData();
+    // 直接修改数据，不触发数组变化
+    Object.assign(slides.value[i], newData);
   }
   
-  // 获取当前索引
-  const currentRealIndex = swiperInstance.ref.realIndex;
-  
-  // 只保留当前位置之后的元素，加上一些之前的元素作为缓冲
-  const keepFromIndex = Math.max(0, currentRealIndex - 5); // 保留当前位置前5个
-  const newSlides = slides.value.slice(keepFromIndex);
-  
-  // 如果清理后元素太少，补充新元素
-  while (newSlides.length < MIN_SLIDES) {
-    const imageUrl = new URL(
-      `../assets/douyin/new_user_grade_level_v1_${getRandomInt(1, 45)}.png`,
-      import.meta.url
-    ).href;
-    newSlides.push({ icon: imageUrl, user: getRandomItem(users), text: getRandomItem(slide) });
-  }
-  
-  const removedCount = slides.value.length - newSlides.length;
-  slides.value = newSlides;
-  
-  console.log(`[清理完成] 清理了 ${removedCount} 个元素，当前元素数量：${slides.value.length}`);
-  
-  // 更新 Swiper
-  nextTick(() => {
-    if (swiperInstance.ref) {
-      swiperInstance.ref.update();
-      // 跳转到开始位置
-      swiperInstance.ref.slideToLoop(5, 0); // 跳到第6个元素（索引5）
-      
-      // 延迟重启自动播放
-      setTimeout(() => {
-        if (wasPlaying && swiperInstance.ref) {
-          swiperInstance.ref.autoplay?.start();
-        }
-        isCleaningUp.value = false;
-      }, 200);
-    } else {
-      isCleaningUp.value = false;
-    }
-  });
+  console.log(`[循环复用] 数据更新完成，数据索引: ${dataIndex}，所有数据已刷新`);
 };
 
-// 执行清理操作（不暂停播放版本）
-const performCleanup = () => {
-  if (!swiperInstance.ref || isCleaningUp.value) return;
-  
-  isCleaningUp.value = true;
-  console.log('[开始清理] 当前元素数量：', slides.value.length);
-  
-  // 获取当前索引（不暂停播放）
-  const currentRealIndex = swiperInstance.ref.realIndex;
-  
-  // 计算保留范围：当前位置前10个到后面所有
-  const keepFromIndex = Math.max(0, currentRealIndex - 10);
-  const newSlides = slides.value.slice(keepFromIndex);
-  
-  // 如果清理后元素太少，补充新元素
-  while (newSlides.length < MIN_SLIDES) {
-    const imageUrl = new URL(
-      `../assets/douyin/new_user_grade_level_v1_${getRandomInt(1, 45)}.png`,
-      import.meta.url
-    ).href;
-    newSlides.push({ icon: imageUrl, user: getRandomItem(users), text: getRandomItem(slide) });
-  }
-  
-  const removedCount = slides.value.length - newSlides.length;
-  
-  // 计算新的索引位置（保持用户当前看到的内容）
-  const newIndex = currentRealIndex - keepFromIndex;
-  
-  // 直接替换数组
-  slides.value = newSlides;
-  
-  console.log(`[清理完成] 清理了 ${removedCount} 个元素，当前元素数量：${slides.value.length}`);
-  
-  // 更新 Swiper（不暂停播放）
-  nextTick(() => {
-    if (swiperInstance.ref) {
-      // 销毁当前实例的 loop，更新后重建
-      swiperInstance.ref.loopDestroy();
-      swiperInstance.ref.update();
-      swiperInstance.ref.loopCreate();
-      // 跳转到对应位置（0速度，用户无感知）
-      swiperInstance.ref.slideToLoop(Math.max(0, newIndex), 0);
-      
-      // 立即解锁（不需要延迟）
-      isCleaningUp.value = false;
-    } else {
-      isCleaningUp.value = false;
-    }
-  });
-};
+
 const onSwiper = (swiper) => {
   console.log('onSwiper')
   swiperInstance.ref = swiper;
@@ -264,25 +195,22 @@ const onSwiper = (swiper) => {
 };
 
 const onSlideChange = (swiper) => {
-  // 如果正在清理，跳过
-  if (isCleaningUp.value) return;
-  
-  // 当接近列表末尾时，动态生成新元素
-  const threshold = 10; // 距离结束还有10个元素时触发
   const currentIndex = swiper.realIndex;
+  console.log(`currentIndex:${currentIndex}`)
   const totalSlides = slides.value.length;
+  const progressRatio = currentIndex / totalSlides;
   
-  // 当接近末尾且未达到最大数量时生成新元素
-  if (totalSlides - currentIndex <= threshold && totalSlides < MAX_SLIDES) {
-    console.log('接近末尾，生成新元素...');
-    // 一次生成4个新元素，保证流畅滚动
-    for (let i = 0; i < 4; i++) {
-      generateNewSlide();
-    }
-    // 延迟更新，确保数据已添加
-    nextTick(() => {
-      swiper.update();
-    });
+  // 当滚动到80%位置时，更新前面的数据（只触发一次）
+  if (progressRatio >= UPDATE_TRIGGER_RATIO && !hasUpdated) {
+    console.log(`[触发更新] 进度: ${(progressRatio * 100).toFixed(1)}%`);
+    hasUpdated = true; // 标记已更新
+    updateFrontSlides(currentIndex);
+  }
+  
+  // 当回到前20%位置时，重置标志位，允许下次循环再次更新
+  if (progressRatio < 0.2 && hasUpdated) {
+    console.log('[重置标志] 已回到前20%，允许下次更新');
+    hasUpdated = false;
   }
 };
 
@@ -290,17 +218,14 @@ onUnmounted(() => {
   if (swiperInstance.ref) {
     swiperInstance.ref.destroy();
   }
-  // 清除定时器，防止内存泄漏
-  if (cleanupTimer) {
-    clearInterval(cleanupTimer);
-    cleanupTimer = null;
-  }
 });
-
-
 
 const refreshPage = () => {
   location.reload();
+}
+
+const closeWindow = () => {
+  ipc.invoke(ipcApiRoute.closeDouyinWindow, { windowName: 'window2' })
 }
 </script>
 
@@ -328,14 +253,16 @@ html, body {
   user-select: none;
   background-color: green;
   position: relative;
-  z-index: 1000000;
+  z-index: 100;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   padding:0;
   margin:0;
   pointer-events: auto; /* 重新启用鼠标事件 */
 }
+
+
 .drag-placeholder {
   width: 100%;
   height: 100%;
@@ -346,37 +273,79 @@ html, body {
   align-items: center;
   padding: 0;
 }
-.swiper-container:hover .setting {
-  display: inline-block
+.drag-placeholder:hover .drag-action{
+  display: flex;
+  opacity: 1;
 }
-
-.mySwiper{
-  width: 100%;
-  height: 100%;
-}
-
-
-/* Swiper 滑块样式 */
-.swiper-slide {
+.drag-action{
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  background: #fff;
-  color: #333;
-  box-sizing: border-box;
-  height: 50%; /* 每个元素占据窗口高度的50% */
-  border-bottom: 1px solid #f0f0f0;
+  z-index: 1000;
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.swiper-slide:nth-child(2n) {
-  background-color: #f9f9f9;
+/*  */
+.mySwiper{
+  width: 100%;
+  height: 100%; 
 }
+
+/* 向左滚动（horizontal）的样式 */
+.horizontal-swiper ::v-deep .swiper-wrapper {
+  display: flex !important;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 100% !important;
+}
+
+.line-3-style .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 18px;
+  color: #333;
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 33.33333333% !important;
+}
+
+/* 向上滚动（vertical）的样式 */
+.line-1-style .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 18px;
+  color: #333;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.line-2-style .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 18px;
+  color: #333;
+  box-sizing: border-box;
+  height: 50%;
+}
+
 
 .slide-content {
   text-align: center;
   width: 100%;
-  height: 100%;
+  height: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -384,7 +353,7 @@ html, body {
   padding: 8px 0; /* 添加上下内边距，避免内容过于贴边 */
 }
 
-/**/
+/* */
 .box {
   display: flex;
   justify-content: flex-start;
@@ -399,7 +368,7 @@ html, body {
 
 .avatar {
   width: 40px; /* 调整头像大小 */
-  height: 40px;
+  /* height: 40px; */
   margin-right: 8px;
   border-radius: 100px;
   overflow: hidden;
@@ -453,12 +422,13 @@ html, body {
 .good-1 span,
 .good-2 span {
   font-family: "Barlow";
-  font-size: 1.18em;
+  font-size: 1.8rem;
   display: inline-block;
-  padding: 0px;
-  font-family: Barlow;
+  padding: 100px;
 }
-
+.good-1 ::v-deep .dynamic-span {
+  font-size: 1.18rem;
+}
 img {
   width: 100%;
   display: block;

@@ -9,7 +9,6 @@ const constantRouterMap = [
     path: "/",
     name: "Example",
     redirect: { name: "LoginIndex" },
-    // DouyinWorkIndex LoginIndex
   },
   {
     path: "/login",
@@ -17,7 +16,7 @@ const constantRouterMap = [
       {
         path: "index",
         name: "LoginIndex",
-        component: () => import("@/views/example/login/Index.vue"),
+        component: () => import("@/views/login/Index.vue"),
       },
     ],
   },
@@ -28,7 +27,7 @@ const constantRouterMap = [
       {
         path: "index",
         name: "DouyinIndex",
-        component: () => import("@/views/douyin.vue"),
+        component: () => import("@/views/douyin/douyin.vue"),
       }
     ]
   },
@@ -38,8 +37,8 @@ const constantRouterMap = [
       {
         path: "index",
         name: "DouyinWorkIndex",
-        component: () => import("@/views/work.vue"),
-      },
+        component: () => import("@/views/douyin/work.vue"),
+      }
     ]
   },
   {

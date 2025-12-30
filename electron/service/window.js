@@ -23,7 +23,7 @@ class WindowService {
    * Create a new window
    */
   createWindow(args) {
-    const { type, content, windowName, windowTitle,width,height,transparent=true,frame=true } = args;
+    const { type, content, windowName, windowTitle,width,height,transparent=true,frame=true,openDevTools=true } = args;
     let contentUrl = null;
     if (type == 'html') {
       contentUrl = path.join('file://', getBaseDir(), content)
@@ -65,6 +65,7 @@ class WindowService {
         contextIsolation: false,
         nodeIntegration: true,
       },
+      openDevTools: openDevTools ?? false,
     }
     const win = new BrowserWindow(opt);
     const winContentsId = win.webContents.id;

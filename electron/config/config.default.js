@@ -11,7 +11,7 @@ module.exports = () => {
     openDevTools: false,
     singleLock: true,
     windowsOption: {
-      title: '流光剪辑',
+      title: '抖音直播间助手',
       width: 500,
       height: 550,
       minWidth: 400,
@@ -22,9 +22,8 @@ module.exports = () => {
         nodeIntegration: true,
         //preload: path.join(getElectronDir(), 'preload', 'bridge.js'),
       },
-      
-      show: true,
-      
+      show: false,
+      autoHideMenuBar: true,
       icon: path.join(getBaseDir(), 'public', 'images', 'logo-32.png'),
     },
     logger: {
@@ -36,7 +35,7 @@ module.exports = () => {
     },
     remote: {
       enable: false,
-      url: 'http://electron-egg.kaka996.com/'
+      url: ''
     },
     socketServer: {
       enable: false,
