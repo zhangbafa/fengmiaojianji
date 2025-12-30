@@ -15,7 +15,7 @@
     <div class="expiry">
         有效期：{{ result?.expires_at.split('T')[0]  }}
         <span v-if="!result?.is_active">
-            <a-button size="mini">续费</a-button>
+            <a-button size="mini" @click="handleRenew">续费</a-button>
         </span>
     </div>
   </div>
@@ -62,6 +62,10 @@ const handleSelect = (v) => {
   }
   router.push({ name: routerName });
 
+};
+const handleRenew = () => {
+  const url = 'https://ye5u058m3j.feishu.cn/wiki/Eo6cwtEk6iYhMXkBWAtcFtsLnxg?from=from_copylink'
+  ipc.invoke(ipcApiRoute.openExternal, url)
 };
 </script>
 
