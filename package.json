@@ -1,5 +1,5 @@
 {
-  "name": "抖音直播间助手",
+  "name": "douyin-live-helper",
   "version": "4.1.0",
   "description": "活跃直播间气氛",
   "main": "./public/electron/main.js",
